@@ -11,7 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 
-	"../entities"
+	"students/entities"
 )
 
 // var DB *gorm.DB
