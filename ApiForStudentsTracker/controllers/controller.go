@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"../entities"
+	"Students/entities"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
 
