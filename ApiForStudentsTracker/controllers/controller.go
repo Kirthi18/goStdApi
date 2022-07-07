@@ -626,8 +626,8 @@ func UpdateStudents(w http.ResponseWriter, r *http.Request) {
 	students.StudentId = params["studentId"]
 
 	// fmt.Println(student)
-	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
-		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining, student.File,
+	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
+		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining,
 		student.Height, student.Weight, student.CurrentLevelOfActivity, student.CurrentRoutine, student.MostStress, student.PranayamaPractice, student.AnySurgery, student.AnyMedical, student.Smoked,
 		student.ReasonForYoga, student.Musculoskeletal, student.Respiratory, student.Cardiovascular, student.Circulatory, student.Neurological, student.Gastrointestinal, student.Endocrinological, student.GynecologicalOrUrological, student.OtherMedicalConditions, student.OtherInformations,
 		// student.UserId, student.CreatedBy, student.CreatedDate, student.ModifiedBy, student.ModifiedDate, student.ActiveStatus)
