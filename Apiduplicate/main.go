@@ -37,25 +37,13 @@ func main() {
 	r.HandleFunc("/user", controllers.LoggedUser).Methods("GET")
 	r.HandleFunc("/logout", controllers.LogOut).Methods("POST")
 	r.HandleFunc("/Register", controllers.RegisterUser).Methods("POST")
-	// r.HandleFunc("/file/{studentId}", controllers.DownloadFile).Methods("GET")
-	// r.HandleFunc("/refresh", controllers.Refresh).Methods("POST")
-	// app := fiber.New()
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	origins := handlers.AllowedOrigins([]string{"http://18.206.139.96:9070"})
+	cred := handlers.AllowCredentials()
 
-	// app.Use(cors.New(cors.Config{
-	// 	AllowCredentials: true,
-	// }))
-
-	// Setup(app)
-
-	// app.Listen(":8000")
-	log.Fatal(http.ListenAndServe(":9070", handlers.CORS(handlers.AllowedMethods([]string{"HEAD", "GET", "POST", "PUT", "DELETE"}), handlers.AllowedOrigins([]string{"*"}), handlers.AllowedHeaders([]string{"authentication", "Content-Type"}), handlers.AllowCredentials())(r)))
+	http.ListenAndServe(":9070", handlers.CORS(headers, methods, origins, cred)(r))
+	
 }
 
-// func Setup(app *fiber.App) {
 
-// 	// app.Post("/api/register", controllers.Register)
-// 	app.Post("/api/login", controllers.Login)
-// 	// app.Get("/api/user", controllers.User)
-// 	// app.Post("/api/logout", controllers.Logout)
-
-// }
