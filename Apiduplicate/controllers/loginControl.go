@@ -56,9 +56,8 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Origin", "http://18.206.139.96:9070")
 	db, err := sqlx.Open("mysql", conn)
 	if err != nil {
 		log.Fatal(err)
