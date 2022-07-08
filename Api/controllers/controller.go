@@ -19,8 +19,8 @@ import (
 
 var DB *gorm.DB
 
-// const conn = "root:QSGGSQ139@tcp(127.0.0.1:3306)/StudentDB"
-const conn = "QSG:QSGgsq@139@tcp(0.0.0.0:3306)/YogaStudentDB"
+
+const conn = "QSG:QSGgsq@139@tcp(0.0.0.0:3306)/YogaStudentdb"
 
 func GetStudents(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
