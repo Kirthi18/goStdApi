@@ -29,7 +29,7 @@ func main() {
 	// origins := handlers.AllowedOrigins([]string{"*"})
 	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
 	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
-	origins := handlers.AllowedOrigins([]string{"http://http://18.206.139.96:4200/"})
+	origins := handlers.AllowedOrigins([]string{"http://http://18.206.139.96"})
 	cred := handlers.AllowCredentials()
 
 	http.ListenAndServe(":9070", handlers.CORS(headers, methods, origins, cred)(r))
