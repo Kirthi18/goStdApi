@@ -81,7 +81,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// fmt.Println("stopped here")
-	expirationTime := time.Now().Add(time.Minute * 5)
+	expirationTime := time.Now().Add(time.Hour * 24)
 
 	claims := &Claims{
 		Username: user.UserName,
