@@ -34,7 +34,7 @@ type SampUser struct {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Credentials", "true")
-	w.Header().Set("Access-Control-Allow-Origin", "http://18.206.139.96:4200")
+	w.Header().Set("Access-Control-Allow-Origin", "http://18.206.139.96")
 	db, err := sqlx.Open("mysql", conn)
 	if err != nil {
 		log.Fatal(err)
