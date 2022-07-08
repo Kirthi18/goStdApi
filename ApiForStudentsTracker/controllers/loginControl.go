@@ -11,14 +11,14 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 
-	"students/entities"
+	"students.com/api/entities"
 )
 
 // var DB *gorm.DB
 
 // const conn = "root:QSGGSQ139@tcp(127.0.0.1:3306)/StudentDB"
 
-var secretKey = []byte("secret_key@Q$g.")
+var secretKey = []byte("secret_key")
 
 var User []entities.Users
 
@@ -32,33 +32,9 @@ type SampUser struct {
 	Password string `json:"passWord"`
 }
 
-func RegisterUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	db, err := sqlx.Open("mysql", conn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	var user *entities.Users = new(entities.Users)
-	_ = json.NewDecoder(r.Body).Decode(&user)
-
-	stmt := fmt.Sprintf(`call InsertUser('%v','%v','%v','%v','%v','%v','%v')`, 0, user.UserName, user.Password, user.FirstName, user.LastName, user.ContactNumber, user.Email)
-	res, err := db.Queryx(stmt)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("user was created")
-
-	defer res.Close()
-
-}
-
 func Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Origin", "http://18.206.139.96:4200")
 	db, err := sqlx.Open("mysql", conn)
 	if err != nil {
 		log.Fatal(err)
@@ -122,30 +98,19 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w,
-		&http.Cookie{
-			Name:    "token",
-			Value:   tokenString,
-			Expires: expirationTime,
-		})
+	cookie := &http.Cookie{
+		Name:    "token",
+		Value:   tokenString,
+		Expires: expirationTime,
+	}
+
+	http.SetCookie(w, cookie)
 	fmt.Println("token is created")
 	User = nil
+
 }
 
 func LoggedUser(w http.ResponseWriter, r *http.Request) {
-
-	// userName, _ := ExtractTokenUsername(r)
-	// for _, value := range User {
-	// 	if userName != value.UserName {
-	// 		w.WriteHeader(http.StatusUnauthorized)
-	// 		return
-	// 	} else {
-	// 		w.WriteHeader(http.StatusAccepted)
-	// 	}
-	// }
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 
 	cookie, err := r.Cookie("token")
 	if err != nil {

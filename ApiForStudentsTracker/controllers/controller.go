@@ -8,11 +8,10 @@ import (
 	"net/http"
 	"os"
 
-	"students/entities"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"students.com/api/entities"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
@@ -20,9 +19,42 @@ import (
 
 var DB *gorm.DB
 
-const conn = "QSG:QSGgsq@139@tcp(0.0.0.0:3306)/YogaStudentdb"
+// const conn = "root:QSGGSQ139@tcp(127.0.0.1:3306)/StudentDB"
+const conn = "QSG:QSGgsq@139@tcp(0.0.0.0:3306)/YogaStudentDB"
 
 func GetStudents(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tokenStr := cookie.Value
+
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	db, err := sqlx.Open("mysql", conn)
 	if err != nil {
@@ -105,6 +137,38 @@ func GetStudents(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetStudent(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tokenStr := cookie.Value
+
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	params := mux.Vars(r)
 	db, err := sqlx.Open("mysql", conn)
@@ -202,14 +266,13 @@ func GetStudent(w http.ResponseWriter, r *http.Request) {
 }
 
 // func CreateStudents(w http.ResponseWriter, r *http.Request) {
-
 // 	db, err := sqlx.Open("mysql", conn)
 // 	if err != nil {
 // 		log.Fatal(err)
 // 	}
 
 // 	// defer db.Close()
-// 	var student *entities.Students = new(entities.Students)
+// 	var student *Students = new(Students)
 // 	_ = json.NewDecoder(r.Body).Decode(&student)
 
 // 	fmt.Println(student)
@@ -233,6 +296,39 @@ func GetStudent(w http.ResponseWriter, r *http.Request) {
 // }
 
 func CreateStudents(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tokenStr := cookie.Value
+
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
 	db, err := sqlx.Open("mysql", conn)
 	if err != nil {
 		log.Fatal(err)
@@ -309,7 +405,68 @@ func CreateStudents(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// func CreateStudents(w http.ResponseWriter, r *http.Request) {
+// 	db, err := sqlx.Open("mysql", conn)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+// 	var student *entities.Students = new(entities.Students)
+// 	_ = json.NewDecoder(r.Body).Decode(&student)
+
+// 	// fmt.Println(student)
+// 	stmt := fmt.Sprintf(` call InsertStudent('%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, 0, student.Name, student.Address,
+// 		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining, student.File,
+// 		student.Height, student.Weight, student.CurrentLevelOfActivity, student.CurrentRoutine, student.MostStress, student.PranayamaPractice, student.AnySurgery, student.AnyMedical, student.Smoked,
+// 		student.ReasonForYoga, student.Musculoskeletal, student.Respiratory, student.Cardiovascular, student.Circulatory, student.Neurological, student.Gastrointestinal, student.Endocrinological, student.GynecologicalOrUrological, student.OtherMedicalConditions, student.OtherInformations,
+// 		// student.UserId, student.CreatedBy, student.CreatedDate, student.ModifiedBy, student.ModifiedDate, student.ActiveStatus)
+// 	)
+
+// 	res, err := db.Queryx(stmt)
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	fmt.Print("student was created")
+// 	w.WriteHeader(200)
+// 	defer res.Close()
+
+// }
+
 func DeleteStudents(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	tokenStr := cookie.Value
+
+	claims := &Claims{}
+
+	tkn, err := jwt.ParseWithClaims(tokenStr, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			return secretKey, nil
+		})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if !tkn.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	params := mux.Vars(r)
 	db, err := sqlx.Open("mysql", conn)
@@ -337,93 +494,6 @@ func DeleteStudents(w http.ResponseWriter, r *http.Request) {
 	defer res.Close()
 
 }
-
-// func UpdateStudents(w http.ResponseWriter, r *http.Request) {
-// 	params := mux.Vars(r)
-// 	db, err := sqlx.Open("mysql", conn)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	students := entities.Students{}
-// 	students.StudentId = params["studentId"]
-
-// 	var student *entities.Students = new(entities.Students)
-
-// 	student.StudentId = r.FormValue("studentId")
-// 	student.Name = r.FormValue("name")
-// 	student.Address = r.FormValue("address")
-// 	student.Mobile = r.FormValue("mobile")
-// 	student.Email = r.FormValue("email")
-// 	student.EmergencyName = r.FormValue("emergencyName")
-// 	student.EmergencyContact = r.FormValue("emergencyContact")
-// 	student.ReferredBy = r.FormValue("referredBy")
-// 	student.Gender = r.FormValue("gender")
-// 	student.DateOfBirth = r.FormValue("dateOfBirth")
-// 	student.Occupation = r.FormValue("occupation")
-// 	student.Education = r.FormValue("education")
-// 	student.Relationship = r.FormValue("relationship")
-// 	student.DateOfJoining = r.FormValue("dateOfJoining")
-// 	File, handler, err := r.FormFile("file")
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	defer File.Close()
-
-// 	fmt.Println("\nfile:", File, "\nheader:", handler, "\nerr", err)
-// 	f, err := os.OpenFile(handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer f.Close()
-// 	_, _ = io.Copy(f, File)
-
-// 	fmt.Println(f)
-
-// 	// res1, err := ioutil.ReadAll(File)
-// 	// if err != nil {
-// 	// 	log.Fatal(err)
-// 	// }
-
-// 	student.Height = r.FormValue("height")
-// 	student.Weight = r.FormValue("weight")
-// 	student.CurrentLevelOfActivity = r.FormValue("currentLevelOfActivity")
-// 	student.CurrentRoutine = r.FormValue("currentRoutine")
-// 	student.MostStress = r.FormValue("mostStress")
-// 	student.PranayamaPractice = r.FormValue("pranayamaPractice")
-// 	student.AnySurgery = r.FormValue("anySurgery")
-// 	student.AnyMedical = r.FormValue("anyMedical")
-// 	student.Smoked = r.FormValue("smoked")
-// 	student.ReasonForYoga = r.FormValue("reasonForYoga")
-// 	student.Musculoskeletal = r.FormValue("musculoskeletal")
-// 	student.Respiratory = r.FormValue("respiratory")
-// 	student.Cardiovascular = r.FormValue("cardiovascular")
-// 	student.Circulatory = r.FormValue("circulatory")
-// 	student.Neurological = r.FormValue("neurological")
-// 	student.Gastrointestinal = r.FormValue("gastrointestinal")
-// 	student.Endocrinological = r.FormValue("endocrinological")
-// 	student.GynecologicalOrUrological = r.FormValue("gynecologicalOrUrological")
-// 	student.OtherMedicalConditions = r.FormValue("otherMedicalConditions")
-// 	student.OtherInformations = r.FormValue("otherInformations")
-
-// 	// fmt.Println(student)
-// 	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
-// 		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining, f,
-// 		student.Height, student.Weight, student.CurrentLevelOfActivity, student.CurrentRoutine, student.MostStress, student.PranayamaPractice, student.AnySurgery, student.AnyMedical, student.Smoked,
-// 		student.ReasonForYoga, student.Musculoskeletal, student.Respiratory, student.Cardiovascular, student.Circulatory, student.Neurological, student.Gastrointestinal, student.Endocrinological, student.GynecologicalOrUrological, student.OtherMedicalConditions, student.OtherInformations,
-// 		// student.UserId, student.CreatedBy, student.CreatedDate, student.ModifiedBy, student.ModifiedDate, student.ActiveStatus)
-// 	)
-
-// 	res, err := db.Queryx(stmt)
-
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-
-// 	fmt.Print("student was Updated")
-// 	w.WriteHeader(200)
-// 	defer res.Close()
-
-// }
 
 func UpdateStudents(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("token")
@@ -464,14 +534,49 @@ func UpdateStudents(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
-	var student *entities.Students = new(entities.Students)
-	_ = json.NewDecoder(r.Body).Decode(&student)
 	students := entities.Students{}
 	students.StudentId = params["studentId"]
 
+	var student *entities.Students = new(entities.Students)
+
+	student.StudentId = r.FormValue("studentId")
+	student.Name = r.FormValue("name")
+	student.Address = r.FormValue("address")
+	student.Mobile = r.FormValue("mobile")
+	student.Email = r.FormValue("email")
+	student.EmergencyName = r.FormValue("emergencyName")
+	student.EmergencyContact = r.FormValue("emergencyContact")
+	student.ReferredBy = r.FormValue("referredBy")
+	student.Gender = r.FormValue("gender")
+	student.DateOfBirth = r.FormValue("dateOfBirth")
+	student.Occupation = r.FormValue("occupation")
+	student.Education = r.FormValue("education")
+	student.Relationship = r.FormValue("relationship")
+	student.DateOfJoining = r.FormValue("dateOfJoining")
+
+	student.Height = r.FormValue("height")
+	student.Weight = r.FormValue("weight")
+	student.CurrentLevelOfActivity = r.FormValue("currentLevelOfActivity")
+	student.CurrentRoutine = r.FormValue("currentRoutine")
+	student.MostStress = r.FormValue("mostStress")
+	student.PranayamaPractice = r.FormValue("pranayamaPractice")
+	student.AnySurgery = r.FormValue("anySurgery")
+	student.AnyMedical = r.FormValue("anyMedical")
+	student.Smoked = r.FormValue("smoked")
+	student.ReasonForYoga = r.FormValue("reasonForYoga")
+	student.Musculoskeletal = r.FormValue("musculoskeletal")
+	student.Respiratory = r.FormValue("respiratory")
+	student.Cardiovascular = r.FormValue("cardiovascular")
+	student.Circulatory = r.FormValue("circulatory")
+	student.Neurological = r.FormValue("neurological")
+	student.Gastrointestinal = r.FormValue("gastrointestinal")
+	student.Endocrinological = r.FormValue("endocrinological")
+	student.GynecologicalOrUrological = r.FormValue("gynecologicalOrUrological")
+	student.OtherMedicalConditions = r.FormValue("otherMedicalConditions")
+	student.OtherInformations = r.FormValue("otherInformations")
+
 	// fmt.Println(student)
-	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
+	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
 		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining,
 		student.Height, student.Weight, student.CurrentLevelOfActivity, student.CurrentRoutine, student.MostStress, student.PranayamaPractice, student.AnySurgery, student.AnyMedical, student.Smoked,
 		student.ReasonForYoga, student.Musculoskeletal, student.Respiratory, student.Cardiovascular, student.Circulatory, student.Neurological, student.Gastrointestinal, student.Endocrinological, student.GynecologicalOrUrological, student.OtherMedicalConditions, student.OtherInformations,
@@ -484,11 +589,100 @@ func UpdateStudents(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	fmt.Print("student was created")
+	fmt.Print("student was Updated")
 	w.WriteHeader(200)
 	defer res.Close()
 
 }
+
+// func UpdateStudents(w http.ResponseWriter, r *http.Request) {
+// 	params := mux.Vars(r)
+// 	db, err := sqlx.Open("mysql", conn)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+// 	defer db.Close()
+// 	var student *entities.Students = new(entities.Students)
+// 	_ = json.NewDecoder(r.Body).Decode(&student)
+// 	students := entities.Students{}
+// 	students.StudentId = params["studentId"]
+
+// 	// fmt.Println(student)
+// 	stmt := fmt.Sprintf(` call UpdateStudent('%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%v','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')`, students.StudentId, student.Name, student.Address,
+// 		student.Mobile, student.Email, student.EmergencyName, student.EmergencyContact, student.ReferredBy, student.Gender, student.DateOfBirth, student.Occupation, student.Education, student.Relationship, student.DateOfJoining, student.File,
+// 		student.Height, student.Weight, student.CurrentLevelOfActivity, student.CurrentRoutine, student.MostStress, student.PranayamaPractice, student.AnySurgery, student.AnyMedical, student.Smoked,
+// 		student.ReasonForYoga, student.Musculoskeletal, student.Respiratory, student.Cardiovascular, student.Circulatory, student.Neurological, student.Gastrointestinal, student.Endocrinological, student.GynecologicalOrUrological, student.OtherMedicalConditions, student.OtherInformations,
+// 		// student.UserId, student.CreatedBy, student.CreatedDate, student.ModifiedBy, student.ModifiedDate, student.ActiveStatus)
+// 	)
+
+// 	res, err := db.Queryx(stmt)
+
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	fmt.Print("student was created")
+// 	w.WriteHeader(200)
+// 	defer res.Close()
+
+// }
+
+// const SecretKey = "secret"
+
+// func Login(c *fiber.Ctx) error {
+
+// 	var data map[string]string
+
+// 	if err := c.BodyParser(&data); err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	var user entities.Users
+
+// 	DB.Where("userName= ?", data["userName"]).First(&user)
+
+// 	if user.UserName == "" {
+// 		c.Status(fiber.StatusNotFound)
+// 		return c.JSON(fiber.Map{
+// 			"message": "user not found",
+// 		})
+// 	}
+
+// 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data["passWord"])); err != nil {
+// 		c.Status(fiber.StatusBadRequest)
+// 		return c.JSON(fiber.Map{
+// 			"message": "incorrect password",
+// 		})
+// 	}
+
+// 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+// 		Issuer:    user.UserId,
+// 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(), //1 day
+// 	})
+
+// 	token, err := claims.SignedString([]byte(SecretKey))
+
+// 	if err != nil {
+// 		c.Status(fiber.StatusInternalServerError)
+// 		return c.JSON(fiber.Map{
+// 			"message": "could not login",
+// 		})
+// 	}
+
+// 	cookie := fiber.Cookie{
+// 		Name:     "jwt",
+// 		Value:    token,
+// 		Expires:  time.Now().Add(time.Hour * 24),
+// 		HTTPOnly: true,
+// 	}
+
+// 	c.Cookie(&cookie)
+
+// 	return c.JSON(fiber.Map{
+// 		"message": "success",
+// 	})
+
+// }
 
 type PartiFile struct {
 	file []byte `json:file`
@@ -509,12 +703,13 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	} else {
-		var f PartiFile
+		f := make([]byte, 64*1000)
+
 		for rows.Next() {
 			rows.Scan(&f)
 
 		}
-		fmt.Println(f)
+
 		jsn, err := json.Marshal(f)
 		if err != nil {
 			log.Fatal(err)
